@@ -9,6 +9,19 @@ This is a Discord bot made to play games of Cards Against Humanity with your fri
 ```
 git clone https://github.com/alexfeed1990/cahBOT
 cd cahBOT
+```
+
+Create an .env file like this:
+
+```
+TOKEN=#bot token#
+CLIENTID=#client id of app#
+OWNERID=#your user id#
+```
+
+then:
+
+```
 npm i
 npm run dev # for uatomatic restart
 npm run run # normal start (node .)
