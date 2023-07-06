@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1",
+    "nodemon": "^2.0.22",
+    "pdf-parse": "^1.1.1"
+  },
+  "name": "cahbot",
+  "version": "1.0.0",
+  "description": "Play Cards Against Humanity with your friends on Discord.",
+  "main": "index.js",
+  "scripts": {
+    "run": "nodemon",
+    "deploy": "node deploy-commands.js"
+  },
+  "author": "Slashed",
+  "license": "MIT"
+}
