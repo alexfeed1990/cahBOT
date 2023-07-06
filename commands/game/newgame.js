@@ -1,4 +1,6 @@
 const { ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, userMention } = require('discord.js');
+const fs = require("node:fs")
+//todo: make the game parse the files split by , and if it has takeX it does what it does and bla bal bal
 
 module.exports = {
 	data: new SlashCommandBuilder()
