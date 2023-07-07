@@ -2,6 +2,7 @@
   "dependencies": {
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
+    "jimp": "^0.22.8",
     "nodemon": "^2.0.22",
     "pdf-parse": "^1.1.1"
   },
