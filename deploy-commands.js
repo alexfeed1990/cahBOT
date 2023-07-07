@@ -1,49 +1,48 @@
-const { REST, Routes } = require('discord.js');
+// Requires idk i've never nodded //
+
 const dotenv = require("dotenv");
+const Eris = require("eris");
+const fs = require("node:fs");
+const path = require("node:path");
+
 dotenv.config();
-const token = process.env.TOKEN;
-const clientId = process.env.CLIENTID;
-const fs = require('node:fs');
-const path = require('node:path');
+const bot = new Eris(process.env.TOKEN, { intents: [] });
 
-const commands = [];
-// Grab all the command files from the commands directory you created earlier
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+bot.on("ready", async () => {
+    console.log("Ready! Deploying commands.");
 
-for (const folder of commandFolders) {
-	// Grab all the command files from the commands directory you created earlier
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
-			commands.push(command.data.toJSON());
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
-	}
-}
+    const commands = await bot.getCommands();
+    const commandsDir = fs.readdirSync("commands").filter(file => file.endsWith('.js'));
+    const args = process.argv;
+    if (commands.length) { for (let i = 0; i < commands.length; i++) { bot.deleteCommand(commands[i].id); } console.log("Deleted commands."); } // Deletes every command if there are any/
 
-// Construct and prepare an instance of the REST module
-const rest = new REST().setToken(token);
+    commandsDir.forEach(file => {
+        const filePath = path.join(__dirname, "commands", file);
+        const fileRequire = require(filePath);
 
-// and deploy your commands!
-(async () => {
-	try {
-		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+        if ('data' in fileRequire && 'execute' in fileRequire) {
+            const commandData = {
+                name: fileRequire.data.name,
+                description: fileRequire.data.description,
+                options: fileRequire.data.options,
+                type: fileRequire.data.type
+            };
+        
+            if(args[1] == "guild") {
+                bot.createGuildCommand(process.env.GUILDID, commandData);
+            } else {
+                bot.createCommand(commandData);
+            }
 
-		// The put method is used to fully refresh all commands in the guild with the current set
-		const data = await rest.put(
-            Routes.applicationCommands(clientId),
-            { body: commands },
-        );        
+            console.log("Deployed commmand: /" + fileRequire.data.name);
+        } else {
+            console.warn(`The command at ${filePath} is missing a required "data" or "execute" property.`);
+        }
 
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-	} catch (error) {
-		// And of course, make sure you catch and log any errors!
-		console.error(error);
-	}
-})();
+        console.log("Deployed commands successfully!");
+        process.exit();
+    });
+});
+
+bot.on("error", (err) => { console.error(err); });
+bot.connect();

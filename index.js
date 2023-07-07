@@ -1,62 +1,79 @@
 // Requires idk i've never nodded //
 
 const dotenv = require("dotenv");
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const Eris = require("eris");
 dotenv.config();
 
-// Variables idk i've never did math //
+const Constants = Eris.Constants;
 
-const token = process.env.TOKEN;
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const bot = new Eris(process.env.TOKEN, {
+	intents: []
+});
 
-// Command bullshit //
+bot.on("ready", async () => { // When the bot is ready
+	console.log("Ready!"); // Log "Ready!"
 
-for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
-	}
-}
+	//Note: You should use guild commands to test, as they update instantly. Global commands can take up to an hour to update.
 
-client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
+	const commands = await bot.getCommands();
 
-	const command = interaction.client.commands.get(interaction.commandName);
+	if (!commands.length) {
+		bot.createCommand({
+			name: "new-game",
+			description: "Create a new Cards Against Humanity game!",
+			options: [
+				{
+					"name": "type", //The name of the option
+					"description": "The type of game.",
+					"type": Constants.ApplicationCommandOptionTypes.STRING, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+					"required": true,
+					"choices": [ //The possible choices for the options
+						{
+							"name": "Normal",
+							"value": "normal"
+						},
+						{
+							"name": "Family",
+							"value": "family"
+						}
+					]
+				}
+			],
+			type: Constants.ApplicationCommandTypes.CHAT_INPUT
+		});
 
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
+		bot.createCommand({
+			name: "help",
+			description: "The help command. Pretty self explanatory.",
+			type: Constants.ApplicationCommandTypes.CHAT_INPUT
+		});
+	} else {
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
 	}
 });
 
-// No more command bullshit //
-
-client.once(Events.ClientReady, c => {
-	console.log(`Ready! Logged in as ${c.user.tag}`);
+bot.on("error", (err) => {
+	console.error(err);
 });
 
-client.login(token);
+
+
+bot.on("interactionCreate", (interaction) => {
+	if (interaction instanceof Eris.CommandInteraction) {
+		/*
+		switch (interaction.data.name) {
+			case "new-game":
+				return interaction.createMessage("code here");
+			case "help":
+				return interaction.createMessage("help message here uwu");
+			default: {
+				return interaction.createMessage("if you see this, the command has not been implemented yet.");
+			}
+		}
+		*/
+
+		//implement shit here
+	}
+});
+
+bot.connect();

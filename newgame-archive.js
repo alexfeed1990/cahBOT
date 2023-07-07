@@ -34,12 +34,10 @@ module.exports = {
         let imageFamily;
         
         if (fs.existsSync(path.join(root, "assets"))) {
-            console.log("sex")
             assetsDir = fs.opendirSync(path.join(root, "assets"))
         }
 
         if (assetsDir && fs.existsSync(path.join(root, "assets", "rulesNormal.png"))) {
-            console.log("double sex")
             rulesNormal = fs.readFileSync(path.join(root, "assets", "rulesNormal.png"));
             rulesNormal = Buffer.Buffer.from(rulesNormal);
         }
@@ -72,10 +70,8 @@ module.exports = {
         const publicEmbed = new EmbedBuilder()
             .setTitle("Cards Against Humanity: " + edition)
             .setDescription("Hosted by: " + userMention(interaction.user.id))
-            .setImage(normal ? imageNormal : imageFamily)
+            //.setImage(normal ? imageNormal : imageFamily)
             .setFooter({ text: "Players: " + players + "/20" })
-        
-        
         
         // Admin embed //
 
@@ -142,16 +138,17 @@ module.exports = {
             const gameButton = await response.awaitMessageComponent({ filter: collectorFilter, time: timeout });
             const adminButton = await adminPanel.awaitMessageComponent({ filter: collectorFilter, time: timeout });
 
-            if(gameButton.customID == "join") {
+            if(gameButton.customId == "join") {
                 players++
-                await interaction.editReply({ 
-                    embeds: [embed],
+                console.log("sex sex")
+                await interaction.update({ 
+                    embeds: [publicEmbed],
                     ephemeral: false,
-                    components: [row]
+                    components: [publicRow]
                 });
             }
 
-            if(adminButton.customID == "start") {
+            if(adminButton.customId == "start") {
                 if(players == 1) {
                     await interaction.followUp({embeds: [cantStartGameEmbed], ephemeral: true})
                 } else if(players < 4) {
@@ -163,9 +160,9 @@ module.exports = {
 
                     const confirmationButton = await confirmationStartGame.awaitMessageComponent({filter: collectorFilter, time: timeout});
 
-                    if(confirmationButton.customID == "yesStart") {
-
-                    } else if (confirmationButton.customID == "noWait") {
+                    if(confirmationButton.customId == "yesStart") {
+                        // start game
+                    } else if (confirmationButton.customId == "noWait") {
                         // you can dismiss these messages now or something
                         await interaction.followUp({content: "You can now dismiss the previous messages. (except for the admin panel dont do that)", ephemeral: true});
                     }
