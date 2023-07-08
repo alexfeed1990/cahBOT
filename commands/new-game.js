@@ -59,13 +59,13 @@ module.exports = {
         }
 
         if (assetsDir && fs.existsSync(path.join(root, "assets", "cahNormal.png"))) {
-            imageNormal = fs.readFileSync(path.join(root, "assets", "cahNormal.png"), 'base64');
-            //imageNormal = new buffer.from(imageNormal.split(",")[1]);
+            imageNormal = fs.readFileSync(path.join(root, "assets", "cahNormal.png"));
+            imageNormal = new buffer.from(imageNormal);
         }
 
         if (assetsDir && fs.existsSync(path.join(root, "assets", "cahFamily.png"))) {
-            imageFamily = fs.readFileSync(path.join(root, "assets", "cahFamily.png"), 'base64');
-            //imageFamily = new buffer.from(imageFamily.split(",")[1]);
+            imageFamily = fs.readFileSync(path.join(root, "assets", "cahFamily.png"));
+            imageFamily = new buffer.from(imageFamily);
         }
 
         // public embed //
@@ -84,7 +84,7 @@ module.exports = {
         const publicEmbed = [{
             title: "Cards Against Humanity: " + edition, // Title of the embed
             description: "Hosted by: " + interaction.member.mention,
-            //image: normal ? imageNormal : imageFamily, //STILL CRASHES
+            image: normal ? "attachment://cahNormal.png" : "attachment://cahFamily.png", //STILL CRASHES
             footer: {
                 text: "Players: " + players + "/20"
             }
@@ -95,7 +95,8 @@ module.exports = {
         const response = interaction.createMessage({
             embeds: publicEmbed,
             ephemeral: false,
-            components: publicComponents
+            components: publicComponents,
+            attachments: [normal ? imageNormal : imageFamily]
         });
 
     },
