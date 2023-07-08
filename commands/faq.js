@@ -8,6 +8,6 @@ module.exports = {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT
     },
     async execute(interaction) {
-        return interaction.createMessage("There are none yet because no one uses the bot. \n What a surprise!");
+        return interaction.createMessage("There are none yet because no one uses the bot.\nWhat a surprise!");
     },
 };

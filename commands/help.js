@@ -8,6 +8,6 @@ module.exports = {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT
     },
     async execute(interaction) {
-        return interaction.createMessage("/new-game - Creates a new CAH game! \n /help - Displays this message. \n /faq - Displays the most frequently-asked-questions (if you didn't know, that's what FAQ stands for.)");
+        return interaction.createMessage("/new-game - Creates a new CAH game!\n/help - Displays this message.\n/faq - Displays the most frequently-asked-questions (if you didn't know, that's what FAQ stands for.)");
     },
 };

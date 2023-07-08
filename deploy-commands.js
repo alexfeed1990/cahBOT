@@ -38,10 +38,10 @@ bot.on("ready", async () => {
         } else {
             console.warn(`The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
-
-        console.log("Deployed commands successfully!");
-        process.exit();
     });
+
+    console.log("Deployed commands successfully!");
+    process.exit();
 });
 
 bot.on("error", (err) => { console.error(err); });

@@ -2,9 +2,13 @@
 
 const dotenv = require("dotenv");
 const Eris = require("eris");
+const fs = require("node:fs");
+const path = require("node:path");
 dotenv.config();
 
 const Constants = Eris.Constants;
+let commands;
+let commandsDir;
 
 const bot = new Eris(process.env.TOKEN, {
 	intents: []
@@ -13,66 +17,35 @@ const bot = new Eris(process.env.TOKEN, {
 bot.on("ready", async () => { // When the bot is ready
 	console.log("Ready!"); // Log "Ready!"
 
-	//Note: You should use guild commands to test, as they update instantly. Global commands can take up to an hour to update.
-
-	const commands = await bot.getCommands();
-
-	if (!commands.length) {
-		bot.createCommand({
-			name: "new-game",
-			description: "Create a new Cards Against Humanity game!",
-			options: [
-				{
-					"name": "type", //The name of the option
-					"description": "The type of game.",
-					"type": Constants.ApplicationCommandOptionTypes.STRING, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
-					"required": true,
-					"choices": [ //The possible choices for the options
-						{
-							"name": "Normal",
-							"value": "normal"
-						},
-						{
-							"name": "Family",
-							"value": "family"
-						}
-					]
-				}
-			],
-			type: Constants.ApplicationCommandTypes.CHAT_INPUT
-		});
-
-		bot.createCommand({
-			name: "help",
-			description: "The help command. Pretty self explanatory.",
-			type: Constants.ApplicationCommandTypes.CHAT_INPUT
-		});
-	} else {
-
-	}
+	commands = await bot.getCommands();
+	commandsDir = fs.readdirSync("commands").filter(file => file.endsWith('.js'));
 });
 
 bot.on("error", (err) => {
 	console.error(err);
 });
 
-
-
 bot.on("interactionCreate", (interaction) => {
 	if (interaction instanceof Eris.CommandInteraction) {
-		/*
-		switch (interaction.data.name) {
-			case "new-game":
-				return interaction.createMessage("code here");
-			case "help":
-				return interaction.createMessage("help message here uwu");
-			default: {
-				return interaction.createMessage("if you see this, the command has not been implemented yet.");
+		// IMPORTANT: You must have your filename be the exact same as your commands name otherwise the bot will not find it.
+		// I'm thinking of ways to fix it but for now, I don't think there are any ways to fix it that are not purely stupid.
+		const commandPath = path.join(__dirname, "commands", interaction.data.name + ".js");
+		if(!fs.existsSync(commandPath)) return interaction.createMessage("if you see this, the command has not been implemented yet.");
+		
+		const commandRequire = require(commandPath);
+		if ('execute' in commandRequire) {
+			try {
+				commandRequire.execute(interaction);
+			} catch {
+				if(interaction.acknowledged) {
+					return interaction.followUp("There was an error while executing this command.");
+				} else {
+					return interaction.createMessage("There was an error while executing this command.");
+				}
 			}
+		} else {
+			console.warn(`The command at ${filePath} is missing the "execute" property.`);
 		}
-		*/
-
-		//implement shit here
 	}
 });
 
